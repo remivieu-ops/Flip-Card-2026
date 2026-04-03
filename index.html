@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu de Flipcards</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  :root {
+    --bg: #f0f4f8;
+    --card-bg: #ffffff;
+    --card-back: #1e293b;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --text: #334155;
+    --text-light: #94a3b8;
+    --text-back: #e2e8f0;
+    --shadow: 0 4px 24px rgba(30,41,59,.08), 0 1px 3px rgba(30,41,59,.06);
+    --shadow-hover: 0 12px 40px rgba(99,102,241,.15), 0 4px 12px rgba(30,41,59,.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(99,102,241,.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(99,102,241,.05) 0%, transparent 50%);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--card-back);
+    margin-bottom: .4rem;
+    letter-spacing: -.02em;
+  }
+
+  .subtitle {
+    color: var(--text-light);
+    font-size: .95rem;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; gap: 1rem; }
+  }
+
+  /* --- Checkbox hack for pure CSS flip --- */
+  .flip-input { display: none; }
+
+  .card-wrapper {
+    perspective: 900px;
+    height: 260px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform .6s cubic-bezier(.4,.0,.2,1);
+  }
+
+  .flip-input:checked + .card-wrapper .card {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.8rem 1.4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* ---- FRONT ---- */
+  .front {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    transition: box-shadow .3s ease;
+  }
+
+  .card-wrapper:hover .front {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .icon {
+    font-size: 2.6rem;
+    margin-bottom: 1rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .card-wrapper:nth-child(1) .icon { animation-delay: 0s; }
+  .card-wrapper:nth-child(2) .icon { animation-delay: .4s; }
+  .card-wrapper:nth-child(3) .icon { animation-delay: .8s; }
+  .card-wrapper:nth-child(4) .icon { animation-delay: 1.2s; }
+  .card-wrapper:nth-child(5) .icon { animation-delay: 1.6s; }
+  .card-wrapper:nth-child(6) .icon { animation-delay: 2s; }
+
+  .question {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: .8rem;
+  }
+
+  .cta {
+    font-size: .8rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: .03em;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    opacity: .85;
+    transition: opacity .2s;
+  }
+
+  .card-wrapper:hover .cta { opacity: 1; }
+
+  .cta::after {
+    content: '→';
+    transition: transform .2s;
+  }
+  .card-wrapper:hover .cta::after {
+    transform: translateX(3px);
+  }
+
+  /* ---- BACK ---- */
+  .back {
+    background: var(--card-back);
+    transform: rotateY(180deg);
+    color: var(--text-back);
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 15% 85%, rgba(99,102,241,.15) 0%, transparent 50%),
+      radial-gradient(circle at 85% 15%, rgba(99,102,241,.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .back .answer-label {
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--accent-light);
+    margin-bottom: .6rem;
+    font-weight: 700;
+  }
+
+  .back .answer {
+    font-size: .88rem;
+    line-height: 1.55;
+    color: var(--text-back);
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back .click-back {
+    position: absolute;
+    bottom: 1rem;
+    font-size: .7rem;
+    color: var(--text-light);
+    opacity: .6;
+  }
+
+  /* staggered entrance */
+  .card-wrapper {
+    opacity: 0;
+    animation: fadeUp .5s ease forwards;
+  }
+  .card-wrapper:nth-child(1) { animation-delay: .1s; }
+  .card-wrapper:nth-child(2) { animation-delay: .2s; }
+  .card-wrapper:nth-child(3) { animation-delay: .3s; }
+  .card-wrapper:nth-child(4) { animation-delay: .4s; }
+  .card-wrapper:nth-child(5) { animation-delay: .5s; }
+  .card-wrapper:nth-child(6) { animation-delay: .6s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* decorative corner pill on front */
+  .front::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: .35;
+  }
+</style>
+</head>
+<body>
+
+<h1>Quiz Culture Pro</h1>
+<p class="subtitle">Cliquez sur une carte pour révéler la réponse</p>
+
+<div class="grid">
+
+  <!-- Card 1 -->
+  <input type="checkbox" id="c1" class="flip-input">
+  <label class="card-wrapper" for="c1">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🎯</div>
+        <div class="question">Quelle est la différence entre manager et leader ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Le <strong>manager</strong> organise, planifie et contrôle les processus. Le <strong>leader</strong> inspire, motive et donne une vision. On peut être l'un sans l'autre, mais les meilleurs combinent les deux.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 2 -->
+  <input type="checkbox" id="c2" class="flip-input">
+  <label class="card-wrapper" for="c2">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🔒</div>
+        <div class="question">Qu'est-ce que le phishing ciblé (spear phishing) ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">C'est une attaque par e-mail personnalisée visant une personne précise, en utilisant des informations spécifiques (nom, poste, entreprise) pour paraître légitime et tromper la victime.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 3 -->
+  <input type="checkbox" id="c3" class="flip-input">
+  <label class="card-wrapper" for="c3">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🤖</div>
+        <div class="question">Qu'est-ce qu'un LLM en entreprise ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Un <strong>Large Language Model</strong> est une IA entraînée sur d'immenses corpus de texte. En entreprise, il sert à automatiser la rédaction, l'analyse de données, le support client et bien plus.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 4 -->
+  <input type="checkbox" id="c4" class="flip-input">
+  <label class="card-wrapper" for="c4">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🛡️</div>
+        <div class="question">Qu'est-ce que la règle du moindre privilège ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Principe de sécurité où chaque utilisateur ne reçoit que les droits d'accès <strong>strictement nécessaires</strong> à ses tâches. Cela limite les dégâts en cas de compromission d'un compte.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 5 -->
+  <input type="checkbox" id="c5" class="flip-input">
+  <label class="card-wrapper" for="c5">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">💡</div>
+        <div class="question">C'est quoi l'intelligence émotionnelle en leadership ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">C'est la capacité d'un leader à reconnaître, comprendre et gérer ses propres émotions ainsi que celles de son équipe, pour créer un climat de confiance et de performance.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 6 -->
+  <input type="checkbox" id="c6" class="flip-input">
+  <label class="card-wrapper" for="c6">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">⚙️</div>
+        <div class="question">Qu'est-ce que le prompt engineering ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">C'est l'art de formuler des instructions précises et structurées pour obtenir les meilleurs résultats d'une IA générative. Un bon prompt = contexte + consigne claire + format attendu.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+</div>
+
+</body>
+</html>
