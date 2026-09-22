@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipcards - Palais des Thés</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root {
+    --bg: #f6f2e9;
+    --card-bg: #fffdf8;
+    --card-back: #1f3b2f;
+    --accent: #9a7b3f;
+    --accent-light: #d8bd7c;
+    --text: #3c3226;
+    --text-light: #a89a83;
+    --text-back: #f0ece1;
+    --shadow: 0 4px 24px rgba(31,59,47,.10), 0 1px 3px rgba(31,59,47,.06);
+    --shadow-hover: 0 12px 40px rgba(154,123,63,.20), 0 4px 12px rgba(31,59,47,.10);
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(31,59,47,.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(154,123,63,.10) 0%, transparent 50%);
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--card-back);
+    margin-bottom: .4rem;
+    letter-spacing: -.02em;
+    text-align: center;
+  }
+  .subtitle {
+    color: var(--text-light);
+    font-size: .95rem;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 900px;
+    width: 100%;
+  }
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; gap: 1rem; }
+  }
+
+  /* --- Checkbox hack for pure CSS flip --- */
+  .flip-input { display: none; }
+  .card-wrapper {
+    perspective: 900px;
+    height: 280px;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform .6s cubic-bezier(.4,.0,.2,1);
+  }
+  .flip-input:checked + .card-wrapper .card {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.8rem 1.4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* ---- FRONT ---- */
+  .front {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(154,123,63,.15);
+    transition: box-shadow .3s ease;
+  }
+  .card-wrapper:hover .front {
+    box-shadow: var(--shadow-hover);
+  }
+  .icon {
+    font-size: 2.6rem;
+    margin-bottom: 1rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .card-wrapper:nth-child(1) .icon { animation-delay: 0s; }
+  .card-wrapper:nth-child(2) .icon { animation-delay: .4s; }
+  .card-wrapper:nth-child(3) .icon { animation-delay: .8s; }
+  .card-wrapper:nth-child(4) .icon { animation-delay: 1.2s; }
+  .card-wrapper:nth-child(5) .icon { animation-delay: 1.6s; }
+  .card-wrapper:nth-child(6) .icon { animation-delay: 2s; }
+  .question {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: .8rem;
+  }
+  .cta {
+    font-size: .8rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: .03em;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    opacity: .85;
+    transition: opacity .2s;
+  }
+  .card-wrapper:hover .cta { opacity: 1; }
+  .cta::after {
+    content: '→';
+    transition: transform .2s;
+  }
+  .card-wrapper:hover .cta::after {
+    transform: translateX(3px);
+  }
+
+  /* ---- BACK ---- */
+  .back {
+    background: var(--card-back);
+    transform: rotateY(180deg);
+    color: var(--text-back);
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 15% 85%, rgba(216,189,124,.18) 0%, transparent 50%),
+      radial-gradient(circle at 85% 15%, rgba(216,189,124,.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .back .answer-label {
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--accent-light);
+    margin-bottom: .6rem;
+    font-weight: 700;
+  }
+  .back .answer {
+    font-size: .86rem;
+    line-height: 1.55;
+    color: var(--text-back);
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+  }
+  .back .answer strong { color: var(--accent-light); font-weight: 700; }
+  .back .click-back {
+    position: absolute;
+    bottom: 1rem;
+    font-size: .7rem;
+    color: var(--accent-light);
+    opacity: .55;
+  }
+
+  /* staggered entrance */
+  .card-wrapper {
+    opacity: 0;
+    animation: fadeUp .5s ease forwards;
+  }
+  .card-wrapper:nth-child(1) { animation-delay: .1s; }
+  .card-wrapper:nth-child(2) { animation-delay: .2s; }
+  .card-wrapper:nth-child(3) { animation-delay: .3s; }
+  .card-wrapper:nth-child(4) { animation-delay: .4s; }
+  .card-wrapper:nth-child(5) { animation-delay: .5s; }
+  .card-wrapper:nth-child(6) { animation-delay: .6s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* decorative corner pill on front */
+  .front::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: .45;
+  }
+</style>
+</head>
+<body>
+<h1>Quiz Boutique &middot; Culture Thé</h1>
+<p class="subtitle">Cliquez sur une carte pour révéler la réponse</p>
+
+<div class="grid">
+  <!-- Card 1 -->
+  <input type="checkbox" id="c1" class="flip-input">
+  <label class="card-wrapper" for="c1">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🍃</div>
+        <div class="question">Qu'est-ce qui différencie un thé vert d'un thé noir ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Tous viennent du même arbuste, le <strong>Camellia sinensis</strong>. C'est le mode de fabrication qui change : le thé vert n'est <strong>pas oxydé</strong>, le thé noir l'est <strong>totalement</strong>. Entre les deux : l'oolong (oxydation partielle) et le thé sombre (oxydation + fermentation).</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 2 -->
+  <input type="checkbox" id="c2" class="flip-input">
+  <label class="card-wrapper" for="c2">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🌡️</div>
+        <div class="question">Quelles températures d'infusion conseiller en boutique ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Repères simples : <strong>thé blanc et vert 70-80 °C</strong> (3 min), <strong>oolong 85-95 °C</strong>, <strong>thé noir et sombre 90-95 °C</strong> (3-5 min), <strong>infusions et rooibos 100 °C</strong> (5-7 min). Une eau trop chaude sur un thé vert = amertume garantie.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 3 -->
+  <input type="checkbox" id="c3" class="flip-input">
+  <label class="card-wrapper" for="c3">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">⛰️</div>
+        <div class="question">Comment expliquer un Grand Cru à un client ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Comme un grand vin : un thé <strong>rare, artisanal, issu d'un terroir d'exception</strong> et récolté en quantité limitée. Nos <strong>Chercheurs de Thé</strong> le sélectionnent directement chez le producteur. On le raconte par son origine, sa récolte et sa saison, pas seulement par son prix.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 4 -->
+  <input type="checkbox" id="c4" class="flip-input">
+  <label class="card-wrapper" for="c4">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🍵</div>
+        <div class="question">Comment préparer et vendre un matcha ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Poudre de thé vert japonais ombré, <strong>fouettée</strong> (chasen) dans une eau à <strong>70-80 °C</strong>, jamais bouillante. 1 g pour 7 cl en usucha. Ventes complémentaires naturelles : <strong>bol, fouet, cuillère</strong> et boîte hermétique pour préserver la couleur.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 5 -->
+  <input type="checkbox" id="c5" class="flip-input">
+  <label class="card-wrapper" for="c5">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🫙</div>
+        <div class="question">Quels conseils de conservation donner en caisse ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Le thé craint <strong>l'air, la lumière, l'humidité, la chaleur et les odeurs</strong>. À garder dans une <strong>boîte hermétique et opaque</strong>, loin des épices et du café. Un thé vert se consomme idéalement dans l'année, un thé noir se garde plus longtemps.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 6 -->
+  <input type="checkbox" id="c6" class="flip-input">
+  <label class="card-wrapper" for="c6">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🤝</div>
+        <div class="question">Quelles questions poser pour bien conseiller un client ?</div>
+        <span class="cta">Cliquer pour découvrir</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Réponse</span>
+        <p class="answer">Trois questions suffisent : <strong>pour qui</strong> (soi, un cadeau), <strong>à quel moment</strong> (matin, après-midi, soir sans théine) et <strong>quels goûts</strong> (nature ou parfumé, doux ou corsé). Ensuite on fait sentir, on raconte l'origine, puis on propose le format : vrac, mousselines ou coffret.</p>
+        <span class="click-back">↩ cliquer pour retourner</span>
+      </div>
+    </div>
+  </label>
+</div>
+
+</body>
+</html>
