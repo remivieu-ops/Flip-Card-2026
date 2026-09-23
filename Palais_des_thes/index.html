@@ -27,26 +27,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1rem;
+    padding: 1.25rem 1rem;
     background-image:
       radial-gradient(ellipse at 20% 0%, rgba(31,59,47,.08) 0%, transparent 60%),
       radial-gradient(ellipse at 80% 100%, rgba(154,123,63,.10) 0%, transparent 50%);
-  }
-  h1 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    color: var(--card-back);
-    margin-bottom: .4rem;
-    letter-spacing: -.02em;
-    text-align: center;
-  }
-  .subtitle {
-    color: var(--text-light);
-    font-size: .95rem;
-    margin-bottom: 2.5rem;
-    font-weight: 400;
-    text-align: center;
   }
   .grid {
     display: grid;
@@ -222,9 +206,6 @@
 </style>
 </head>
 <body>
-<h1>Quiz Boutique &middot; Les Arômes du Thé</h1>
-<p class="subtitle">À chaque étape de fabrication ses arômes &mdash; cliquez sur une carte pour révéler la réponse</p>
-
 <div class="grid">
   <!-- Card 1 -->
   <input type="checkbox" id="c1" class="flip-input">
