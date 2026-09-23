@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipcard Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+  :root {
+    --bg: #f0f4f8;
+    --card-bg: #ffffff;
+    --card-back: #1e293b;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --text: #334155;
+    --text-light: #94a3b8;
+    --text-back: #e2e8f0;
+    --shadow: 0 4px 24px rgba(30,41,59,.08), 0 1px 3px rgba(30,41,59,.06);
+    --shadow-hover: 0 12px 40px rgba(99,102,241,.15), 0 4px 12px rgba(30,41,59,.08);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1.2rem 1rem;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(99,102,241,.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(99,102,241,.05) 0%, transparent 50%);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    color: var(--card-back);
+    margin-bottom: .4rem;
+    letter-spacing: -.02em;
+  }
+
+  .subtitle {
+    color: var(--text-light);
+    font-size: .85rem;
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 820px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; gap: 1rem; }
+  }
+
+  .flip-input { display: none; }
+
+  .card-wrapper {
+    perspective: 900px;
+    height: 200px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform .6s cubic-bezier(.4,.0,.2,1);
+  }
+
+  .flip-input:checked + .card-wrapper .card {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 1.1rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .front {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    transition: box-shadow .3s ease;
+  }
+
+  .card-wrapper:hover .front {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .icon {
+    font-size: 2rem;
+    margin-bottom: .6rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .card-wrapper:nth-child(1) .icon { animation-delay: 0s; }
+  .card-wrapper:nth-child(2) .icon { animation-delay: .4s; }
+  .card-wrapper:nth-child(3) .icon { animation-delay: .8s; }
+  .card-wrapper:nth-child(4) .icon { animation-delay: 1.2s; }
+  .card-wrapper:nth-child(5) .icon { animation-delay: 1.6s; }
+  .card-wrapper:nth-child(6) .icon { animation-delay: 2s; }
+
+  .question {
+    font-weight: 600;
+    font-size: .88rem;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: .5rem;
+  }
+
+  .cta {
+    font-size: .72rem;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: .03em;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    opacity: .85;
+    transition: opacity .2s;
+  }
+
+  .card-wrapper:hover .cta { opacity: 1; }
+
+  .cta::after {
+    content: '→';
+    transition: transform .2s;
+  }
+  .card-wrapper:hover .cta::after {
+    transform: translateX(3px);
+  }
+
+  .back {
+    background: var(--card-back);
+    transform: rotateY(180deg);
+    color: var(--text-back);
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 15% 85%, rgba(99,102,241,.15) 0%, transparent 50%),
+      radial-gradient(circle at 85% 15%, rgba(99,102,241,.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .back .answer-label {
+    font-size: .58rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--accent-light);
+    margin-bottom: .4rem;
+    font-weight: 700;
+  }
+
+  .back .answer {
+    font-size: .78rem;
+    line-height: 1.45;
+    color: var(--text-back);
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+  }
+
+  .back .click-back {
+    position: absolute;
+    bottom: .6rem;
+    font-size: .6rem;
+    color: var(--text-light);
+    opacity: .6;
+  }
+
+  .card-wrapper {
+    opacity: 0;
+    animation: fadeUp .5s ease forwards;
+  }
+  .card-wrapper:nth-child(1) { animation-delay: .1s; }
+  .card-wrapper:nth-child(2) { animation-delay: .2s; }
+  .card-wrapper:nth-child(3) { animation-delay: .3s; }
+  .card-wrapper:nth-child(4) { animation-delay: .4s; }
+  .card-wrapper:nth-child(5) { animation-delay: .5s; }
+  .card-wrapper:nth-child(6) { animation-delay: .6s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .front::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: .35;
+  }
+</style>
+</head>
+<body>
+
+<h1>Pro Culture Quiz</h1>
+<p class="subtitle">Click a card to reveal the answer</p>
+
+<div class="grid">
+
+  <!-- Card 1 -->
+  <input type="checkbox" id="c1" class="flip-input">
+  <label class="card-wrapper" for="c1">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🎯</div>
+        <div class="question">What is the difference between a manager and a leader?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">A <strong>manager</strong> organizes, plans, and controls processes. A <strong>leader</strong> inspires, motivates, and provides vision. You can be one without the other, but the best combine both.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 2 -->
+  <input type="checkbox" id="c2" class="flip-input">
+  <label class="card-wrapper" for="c2">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🔒</div>
+        <div class="question">What is spear phishing?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">It's a targeted email attack aimed at a specific person, using personal details (name, role, company) to appear legitimate and trick the victim into taking action.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 3 -->
+  <input type="checkbox" id="c3" class="flip-input">
+  <label class="card-wrapper" for="c3">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🤖</div>
+        <div class="question">What is an LLM in business?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">A <strong>Large Language Model</strong> is an AI trained on massive text datasets. In business, it helps automate writing, data analysis, customer support, and much more.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 4 -->
+  <input type="checkbox" id="c4" class="flip-input">
+  <label class="card-wrapper" for="c4">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">🛡️</div>
+        <div class="question">What is the principle of least privilege?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">A security principle where each user is granted only the access rights <strong>strictly necessary</strong> for their tasks. This limits damage if an account is compromised.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 5 -->
+  <input type="checkbox" id="c5" class="flip-input">
+  <label class="card-wrapper" for="c5">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">💡</div>
+        <div class="question">What is emotional intelligence in leadership?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">It's a leader's ability to recognize, understand, and manage their own emotions as well as their team's, in order to build trust and drive performance.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+  <!-- Card 6 -->
+  <input type="checkbox" id="c6" class="flip-input">
+  <label class="card-wrapper" for="c6">
+    <div class="card">
+      <div class="card-face front">
+        <div class="icon">⚙️</div>
+        <div class="question">What is prompt engineering?</div>
+        <span class="cta">Click to discover</span>
+      </div>
+      <div class="card-face back">
+        <span class="answer-label">Answer</span>
+        <p class="answer">It's the art of crafting precise, structured instructions to get the best results from generative AI. A good prompt = context + clear instruction + expected format.</p>
+        <span class="click-back">↩ click to flip back</span>
+      </div>
+    </div>
+  </label>
+
+</div>
+
+</body>
+</html>
