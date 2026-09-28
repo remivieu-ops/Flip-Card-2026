@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes projets | Remivieu Ops</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #f0f3f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid #30363d;
+      border-radius: 30px;
+      color: #8b949e;
+      font-size: 13px;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      margin: 0 0 16px;
+      letter-spacing: -1.5px;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 17px;
+      line-height: 1.6;
+      margin: 0 auto 45px;
+      max-width: 560px;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      text-align: left;
+    }
+
+    .project {
+      display: flex;
+      flex-direction: column;
+      min-height: 235px;
+      padding: 28px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 18px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .project:hover {
+      transform: translateY(-5px);
+      border-color: #58a6ff;
+    }
+
+    .icon {
+      font-size: 35px;
+      margin-bottom: 22px;
+    }
+
+    .project h2 {
+      font-size: 22px;
+      margin: 0 0 12px;
+    }
+
+    .project p {
+      color: #8b949e;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 25px;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: auto;
+      align-self: flex-start;
+      background: #238636;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .project:hover .button {
+      background: #2ea043;
+    }
+
+    footer {
+      margin-top: 45px;
+      color: #6e7681;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .projects {
+        grid-template-columns: 1fr;
+      }
+
+      .project {
+        min-height: 210px;
+      }
+
+      .subtitle {
+        margin-bottom: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <span class="tag">REMIVIEU OPS · PORTFOLIO</span>
+
+    <h1>Mes projets</h1>
+
+    <p class="subtitle">
+      Retrouvez mes réalisations interactives et explorez
+      les différents projets développés.
+    </p>
+
+    <section class="projects">
+
+      <a class="project" href="Flipcards%20FR/">
+        <div class="icon">🃏</div>
+        <h2>Flipcards FR</h2>
+        <p>
+          Découvrez le projet Flipcards FR et ses cartes
+          interactives.
+        </p>
+        <span class="button">Voir le projet →</span>
+      </a>
+
+      <a class="project" href="Palais_des_thes/">
+        <div class="icon">🍵</div>
+        <h2>Palais des Thés</h2>
+        <p>
+          Accédez à l'expérience interactive dédiée
+          au projet Palais des Thés.
+        </p>
+        <span class="button">Voir le projet →</span>
+      </a>
+
+    </section>
+
+    <footer>
+      © 2026 Remivieu Ops · Tous les projets au même endroit
+    </footer>
+  </main>
+</body>
+</html>
